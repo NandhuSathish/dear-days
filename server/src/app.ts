@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import type { Request, Response } from 'express';
 import type { IApiResponse } from '@dear-days/shared';
 import { env } from './config/env.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import { requestLogger } from './middlewares/requestLogger.js';
 import apiRouter from './routes/index.js';
 
 /**
@@ -21,11 +23,14 @@ app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// HTTP request logging
+app.use(requestLogger);
+
 // Serve uploaded files
 app.use('/uploads', express.static(env.UPLOAD_DIR));
 
 // Health check
-app.get('/api/health', (_req, res) => {
+app.get('/api/health', (_req: Request, res: Response) => {
   const response: IApiResponse<{ status: string; timestamp: number }> = {
     success: true,
     data: { status: 'ok', timestamp: Date.now() },
@@ -37,7 +42,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/v1', apiRouter);
 
 // 404 handler for unmatched routes
-app.use((_req, res) => {
+app.use((_req: Request, res: Response) => {
   const response: IApiResponse = {
     success: false,
     message: 'Route not found',

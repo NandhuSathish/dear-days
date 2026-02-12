@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { env } from './env.js';
+import logger from '../utils/logger.js';
 
 /**
  * Establishes a connection to MongoDB using the configured URI.
@@ -9,15 +10,15 @@ export async function connectDatabase(): Promise<void> {
   mongoose.set('strictQuery', true);
 
   mongoose.connection.on('error', (error) => {
-    console.error('MongoDB runtime error:', error);
+    logger.error('MongoDB runtime error', { error });
   });
 
   mongoose.connection.on('disconnected', () => {
-    console.warn('MongoDB disconnected');
+    logger.warn('MongoDB disconnected');
   });
 
   await mongoose.connect(env.MONGODB_URI);
-  console.log('MongoDB connected successfully');
+  logger.info('MongoDB connected successfully');
 }
 
 /**
@@ -25,5 +26,5 @@ export async function connectDatabase(): Promise<void> {
  */
 export async function disconnectDatabase(): Promise<void> {
   await mongoose.disconnect();
-  console.log('MongoDB disconnected gracefully');
+  logger.info('MongoDB disconnected gracefully');
 }

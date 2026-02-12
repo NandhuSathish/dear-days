@@ -1,6 +1,7 @@
 import app from './app.js';
 import { env } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
+import logger from './utils/logger.js';
 
 /**
  * Application entry point.
@@ -11,12 +12,12 @@ async function main(): Promise<void> {
     await connectDatabase();
 
     const server = app.listen(env.PORT, () => {
-      console.log(`Server running on port ${env.PORT} [${env.NODE_ENV}]`);
+      logger.info(`Server running on port ${env.PORT} [${env.NODE_ENV}]`);
     });
 
     // Graceful shutdown
     const shutdown = async (signal: string) => {
-      console.log(`\n${signal} received. Shutting down gracefully...`);
+      logger.info(`${signal} received. Shutting down gracefully...`);
       server.close(async () => {
         await disconnectDatabase();
         process.exit(0);
@@ -26,14 +27,14 @@ async function main(): Promise<void> {
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     process.on('SIGINT', () => shutdown('SIGINT'));
   } catch (error) {
-    console.error('Failed to start server:', error);
+    logger.error('Failed to start server', { error });
     process.exit(1);
   }
 }
 
 // Handle unhandled rejections
 process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection:', reason);
+  logger.error('Unhandled Rejection', { reason });
   process.exit(1);
 });
 

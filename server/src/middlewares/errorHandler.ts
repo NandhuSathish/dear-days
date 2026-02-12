@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { IApiResponse } from '@dear-days/shared';
 import { env } from '../config/env.js';
+import logger from '../utils/logger.js';
 
 /**
  * Custom application error with HTTP status code.
@@ -27,7 +28,9 @@ export class AppError extends Error {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction): void {
   if (env.NODE_ENV === 'development') {
-    console.error('Error:', err);
+    logger.error(err.message, { stack: err.stack });
+  } else {
+    logger.error(err.message);
   }
 
   // Custom application error
