@@ -1,9 +1,7 @@
 import { create } from 'zustand';
-import type { IJournal } from '@dear-days/shared';
+import type { IJournal, IJournalCreate } from '@dear-days/shared';
+import * as journalService from '@/services/journal.service';
 
-/**
- * Journal state shape.
- */
 interface JournalState {
   journals: IJournal[];
   currentJournal: IJournal | null;
@@ -11,14 +9,11 @@ interface JournalState {
   error: string | null;
 }
 
-/**
- * Journal store actions.
- */
 interface JournalActions {
-  setJournals: (journals: IJournal[]) => void;
+  fetchJournals: () => Promise<void>;
+  createJournal: (data: IJournalCreate) => Promise<IJournal>;
+  deleteJournal: (id: string) => Promise<void>;
   setCurrentJournal: (journal: IJournal | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
   reset: () => void;
 }
 
@@ -32,11 +27,32 @@ const initialState: JournalState = {
 /**
  * Zustand store for journal data and UI state.
  */
-export const useJournalStore = create<JournalState & JournalActions>()((set) => ({
+export const useJournalStore = create<JournalState & JournalActions>()((set, get) => ({
   ...initialState,
-  setJournals: (journals) => set({ journals }),
+
+  fetchJournals: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const journals = await journalService.fetchJournals();
+      set({ journals, isLoading: false });
+    } catch {
+      set({ error: 'Failed to load journals', isLoading: false });
+    }
+  },
+
+  createJournal: async (data) => {
+    set({ error: null });
+    const journal = await journalService.createJournal(data);
+    set({ journals: [journal, ...get().journals] });
+    return journal;
+  },
+
+  deleteJournal: async (id) => {
+    set({ error: null });
+    await journalService.deleteJournal(id);
+    set({ journals: get().journals.filter((j) => j.id !== id) });
+  },
+
   setCurrentJournal: (currentJournal) => set({ currentJournal }),
-  setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
   reset: () => set(initialState),
 }));
