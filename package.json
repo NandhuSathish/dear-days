@@ -19,7 +19,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "clean": "tsc --build --clean"
+    "clean": "tsc --build --clean",
+    "db:up": "docker compose up -d mongodb",
+    "db:down": "docker compose down"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",

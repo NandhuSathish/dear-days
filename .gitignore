@@ -35,5 +35,8 @@ vite.config.ts.timestamp-*
 # Test coverage
 coverage/
 
+# Docker data (local persistence)
+data/
+
 # Uploads (local dev)
 uploads/
