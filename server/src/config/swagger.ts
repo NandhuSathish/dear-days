@@ -93,6 +93,123 @@ const options: swaggerJsdoc.Options = {
             },
           },
         },
+
+        /* ── Journal schemas ── */
+        JournalCreate: {
+          type: 'object',
+          required: ['title'],
+          properties: {
+            title: { type: 'string', maxLength: 100, example: 'Summer 2025' },
+            description: { type: 'string', maxLength: 500, example: 'Memories from summer vacation' },
+            coverImageUrl: { type: 'string', format: 'uri' },
+            tags: { type: 'array', items: { type: 'string' }, example: ['travel', 'summer'] },
+            isPublic: { type: 'boolean', default: false },
+          },
+        },
+        JournalUpdate: {
+          type: 'object',
+          properties: {
+            title: { type: 'string', maxLength: 100 },
+            description: { type: 'string', maxLength: 500 },
+            coverImageUrl: { type: 'string', format: 'uri' },
+            tags: { type: 'array', items: { type: 'string' } },
+            isPublic: { type: 'boolean' },
+          },
+        },
+        Journal: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            title: { type: 'string' },
+            description: { type: 'string' },
+            coverImageUrl: { type: 'string' },
+            ownerId: { type: 'string' },
+            pageIds: { type: 'array', items: { type: 'string' } },
+            tags: { type: 'array', items: { type: 'string' } },
+            isPublic: { type: 'boolean' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        JournalApiResponse: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            data: { $ref: '#/components/schemas/Journal' },
+          },
+        },
+        JournalListApiResponse: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            data: { type: 'array', items: { $ref: '#/components/schemas/Journal' } },
+          },
+        },
+
+        /* ── Page schemas ── */
+        PageCreate: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            sortOrder: { type: 'integer', minimum: 0 },
+            width: { type: 'integer', minimum: 1, default: 800 },
+            height: { type: 'integer', minimum: 1, default: 600 },
+            backgroundColor: { type: 'string', default: '#ffffff' },
+          },
+        },
+        PageUpdate: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            sortOrder: { type: 'integer', minimum: 0 },
+            width: { type: 'integer', minimum: 1 },
+            height: { type: 'integer', minimum: 1 },
+            backgroundColor: { type: 'string' },
+            elements: { type: 'array', items: { $ref: '#/components/schemas/Element' } },
+          },
+        },
+        Element: {
+          type: 'object',
+          required: ['type', 'x', 'y', 'width', 'height'],
+          properties: {
+            id: { type: 'string' },
+            type: { type: 'string', enum: ['text', 'image', 'shape', 'sticker', 'drawing'] },
+            x: { type: 'number' },
+            y: { type: 'number' },
+            width: { type: 'number' },
+            height: { type: 'number' },
+            rotation: { type: 'number', default: 0 },
+            scaleX: { type: 'number', default: 1 },
+            scaleY: { type: 'number', default: 1 },
+            opacity: { type: 'number', default: 1 },
+            zIndex: { type: 'integer', default: 0 },
+            draggable: { type: 'boolean', default: true },
+            locked: { type: 'boolean', default: false },
+          },
+          description: 'Base element properties. Type-specific fields (text, src, fill, etc.) vary by element type.',
+        },
+        Page: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            journalId: { type: 'string' },
+            title: { type: 'string' },
+            sortOrder: { type: 'integer' },
+            width: { type: 'integer' },
+            height: { type: 'integer' },
+            backgroundColor: { type: 'string' },
+            elements: { type: 'array', items: { $ref: '#/components/schemas/Element' } },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        PageApiResponse: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            data: { $ref: '#/components/schemas/Page' },
+          },
+        },
       },
     },
   },
