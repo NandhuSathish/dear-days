@@ -32,5 +32,8 @@ npm-debug.log*
 # Vite
 vite.config.ts.timestamp-*
 
+# Test coverage
+coverage/
+
 # Uploads (local dev)
 uploads/

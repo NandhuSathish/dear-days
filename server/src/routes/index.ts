@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import authRoutes from './auth.routes.js';
 
 /**
  * Central API route aggregator.
@@ -6,8 +7,9 @@ import { Router } from 'express';
  */
 const router = Router();
 
+router.use('/auth', authRoutes);
+
 // Route mounting points — uncomment as features are implemented:
-// router.use('/auth', authRoutes);
 // router.use('/journals', journalRoutes);
 // router.use('/pages', pageRoutes);
 // router.use('/upload', uploadRoutes);

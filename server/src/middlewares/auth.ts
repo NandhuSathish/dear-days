@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AppError } from './errorHandler.js';
+import { verifyAccessToken } from '../services/auth.service.js';
 
 /**
  * Augment the Express Request interface to include the authenticated user.
@@ -13,8 +14,6 @@ declare module 'express' {
 /**
  * Authentication middleware that verifies JWT from the Authorization header.
  * Attaches the decoded user payload to `req.user`.
- *
- * TODO: Implement JWT verification in the auth feature phase.
  */
 export function authenticate(req: Request, _res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
@@ -31,7 +30,11 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
     return;
   }
 
-  // TODO: Verify token with jsonwebtoken and attach decoded user to req.user
-  // For now, pass through to allow skeleton to compile
-  next();
+  try {
+    const decoded = verifyAccessToken(token);
+    req.user = { id: decoded.id, email: decoded.email };
+    next();
+  } catch (err) {
+    next(err);
+  }
 }

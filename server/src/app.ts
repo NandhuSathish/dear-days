@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 import type { Request, Response } from 'express';
 import type { IApiResponse } from '@dear-days/shared';
 import { env } from './config/env.js';
+import { swaggerSpec } from './config/swagger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { requestLogger } from './middlewares/requestLogger.js';
 import apiRouter from './routes/index.js';
@@ -28,6 +30,9 @@ app.use(requestLogger);
 
 // Serve uploaded files
 app.use('/uploads', express.static(env.UPLOAD_DIR));
+
+// Swagger API docs
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check
 app.get('/api/health', (_req: Request, res: Response) => {
